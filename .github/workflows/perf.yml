@@ -4,7 +4,7 @@ on:
   pull_request:
   merge_group: # (a merge queue's)
   push:
-    branches: [master]
+    branches: [master, ci-check]
   schedule:
     - cron: "0 4 * * *"
   workflow_dispatch:
@@ -85,10 +85,10 @@ jobs:
       - name: Compare
         id: compare
         env:
-          DUEL_BASE: ${{ github.event_name == 'schedule' && 'last-release' || github.event_name == 'push' && github.event.before || github.event_name == 'merge_group' && github.event.merge_group.base_sha || '' }}
+          DUEL_BASE: ${{ github.event_name == 'schedule' && 'last-release' || github.ref_name == 'ci-check' && 'origin/master' || github.event_name == 'push' && github.event.before || github.event_name == 'merge_group' && github.event.merge_group.base_sha || '' }}
           # (Run by hand, it compares anyway: with nothing changed, the code
           # with itself, which checks the setup.)
-          DUEL_FORCE: ${{ github.event_name == 'workflow_dispatch' && '1' || '' }}
+          DUEL_FORCE: ${{ (github.event_name == 'workflow_dispatch' || github.ref_name == 'ci-check') && '1' || '' }}
           DUEL_LABELS: ${{ steps.labels.outputs.labels }}
         run: bundle exec duel --markdown "$RUNNER_TEMP/duel/duel.md"
       # For a pull request, what Duel said, for the Perf comment workflow,
