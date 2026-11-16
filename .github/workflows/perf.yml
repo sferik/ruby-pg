@@ -88,11 +88,8 @@ jobs:
         echo "BUNDLE_WITH=duel" >> "$GITHUB_ENV"
         echo "DUEL_POSTGRESQL_BIN=$PGBIN" >> "$GITHUB_ENV"
       setup-after-ruby: |
-        type -a ridk ridk.cmd pacman || true
-        env | grep -E '^(RI_DEVKIT|MSYSTEM|MINGW_|MSYS)' || true
-        ls "$RI_DEVKIT/usr/bin/pacman.exe" || true
-        ridk.cmd exec pacman --sync --needed --noconfirm "${MINGW_PACKAGE_PREFIX}-gcc"
-        curl -fsSL -o "$RUNNER_TEMP/postgresql.zip" https://get.enterprisedb.com/postgresql/postgresql-18.0-1-windows-x64-binaries.zip
-        7z x -y -o"$RUNNER_TEMP" "$RUNNER_TEMP/postgresql.zip" > /dev/null
+        pacman --sync --needed --noconfirm "${MINGW_PACKAGE_PREFIX}-gcc"
+        (cd "$RUNNER_TEMP" && curl -fsSL -o postgresql.zip https://get.enterprisedb.com/postgresql/postgresql-18.0-1-windows-x64-binaries.zip &&
+          7z x -y postgresql.zip > /dev/null)
         { echo "$RI_DEVKIT$MINGW_PREFIX/bin"; echo "$RI_DEVKIT/usr/bin"; echo "$RUNNER_TEMP/pgsql/bin"; } >> "$GITHUB_PATH"
       accept-label: "duel: accept"
