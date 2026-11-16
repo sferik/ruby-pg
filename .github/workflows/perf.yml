@@ -91,5 +91,7 @@ jobs:
         pacman --sync --needed --noconfirm "${MINGW_PACKAGE_PREFIX}-gcc"
         (cd "$RUNNER_TEMP" && curl -fsSL -o postgresql.zip https://get.enterprisedb.com/postgresql/postgresql-18.0-1-windows-x64-binaries.zip &&
           7z x -y postgresql.zip > /dev/null)
-        { echo "$RI_DEVKIT$MINGW_PREFIX/bin"; echo "$RI_DEVKIT/usr/bin"; echo "$RUNNER_TEMP/pgsql/bin"; } >> "$GITHUB_PATH"
+        # (One line, in this order: each line goes before the last, and
+        # PostgreSQL's DLLs mustn't come before the devkit's, which gcc runs.)
+        echo "$RI_DEVKIT$MINGW_PREFIX/bin;$RI_DEVKIT/usr/bin;$RUNNER_TEMP/pgsql/bin" >> "$GITHUB_PATH"
       accept-label: "duel: accept"
